@@ -1,0 +1,12 @@
+[workspace]
+authors = ["Lukasz Czerniawski <l.czerniawski@icloud.com>"]
+channels = ["https://conda.modular.com/max", "conda-forge"]
+name = "uuid"
+description = "A small Mojo library for generating, parsing, validating, and formatting UUID values in RFC-4122-compatible string forms."
+platforms = ["osx-arm64", "linux-64", "linux-aarch64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+mojo = ">=1.0.0b1,<2"
