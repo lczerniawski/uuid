@@ -1,0 +1,13 @@
+{
+  "python-envs.defaultEnvManager": "ms-python.python:system",
+  "mojo.lsp.includeDirs": [
+    "src"
+  ],
+  "cSpell.words": [
+    "comptime",
+    "elif",
+    "fieldwise",
+    "repr",
+    "staticmethod"
+  ]
+}

@@ -7,6 +7,7 @@ platforms = ["osx-arm64", "linux-64", "linux-aarch64"]
 version = "0.1.0"
 
 [tasks]
+test = "sh scripts/run_tests.sh"
 
 [dependencies]
 mojo = ">=1.0.0b1,<2"
