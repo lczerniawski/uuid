@@ -61,13 +61,16 @@ def get_secure_random_u16() raises -> UInt16:
             raise Error("Linux getrandom failed to provide 2 bytes of entropy")
         return buf
 
-    comptime if compilation_target.is_macos():
+    elif compilation_target.is_macos():
         # Definition: uint32_t arc4random(void);
         # Returns: A random 32-bit integer.
         var result = external_call["arc4random", UInt32]()
         return UInt16(result)
 
-    raise Error("Unsupported OS: Secure random not implemented")
+    else:
+        compilation_target.unsupported_target_error[
+            note="Unsupported OS: Secure random not implemented"
+        ]()
 
 
 def get_secure_random_u64() raises -> UInt64:
@@ -93,11 +96,52 @@ def get_secure_random_u64() raises -> UInt64:
             raise Error("Linux getrandom failed to provide 8 bytes of entropy")
         return buf
 
-    comptime if compilation_target.is_macos():
+    elif compilation_target.is_macos():
         # Definition: uint32_t arc4random(void);
         # Returns: A random 32-bit integer.
         var hi = UInt64(external_call["arc4random", UInt32]())
         var lo = UInt64(external_call["arc4random", UInt32]())
         return (hi << 32) | lo
 
-    raise Error("Unsupported OS: Secure random not implemented")
+    else:
+        compilation_target.unsupported_target_error[
+            note="Unsupported OS: Secure random not implemented"
+        ]()
+
+
+def compute_md5(
+    data: Span[UInt8, ...]
+) -> SIMD[DType.uint8, 16]:
+    """
+    Compute MD5 hash of input string.
+
+    Returns:
+        `SIMD[DType.uint8, 16]`: 16-byte MD5 hash.
+    """
+    comptime compilation_target = CompilationTarget()
+    comptime if compilation_target.is_linux():
+        # OpenSSL: MD5(data, len, result) - one-shot function.
+        var result = SIMD[DType.uint8, 16](0)
+        var data_ptr = data.unsafe_ptr()
+        var data_len = len(data)
+
+        _ = external_call["MD5", OwnedPointer[UInt8]](
+            data_ptr, UInt(data_len), Pointer(to=result)
+        )
+        return result
+
+    elif compilation_target.is_macos():
+        # CommonCrypto: CC_MD5(data, len, result)
+        var result = SIMD[DType.uint8, 16](0)
+        var data_ptr = data.unsafe_ptr()
+        var data_len = len(data)
+
+        external_call["CC_MD5", NoneType](
+            data_ptr, UInt32(data_len), Pointer(to=result)
+        )
+        return result
+
+    else:
+        compilation_target.unsupported_target_error[
+            note="Unsupported OS: Computing MD5 hash not implemented"
+        ]()

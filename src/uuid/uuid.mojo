@@ -167,6 +167,9 @@ struct UUID(Equatable, ImplicitlyCopyable, Writable):
             result += self.hex_chars[b & 0x0F]
         return result
 
+    def to_bytes(self: Self) -> SIMD[DType.uint8, 16]:
+        return self.bytes
+
     def urn(self: Self) -> String:
         """
         Render the UUID as a URN.

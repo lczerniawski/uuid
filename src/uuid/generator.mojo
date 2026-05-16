@@ -1,6 +1,7 @@
 from .uuid import UUID
 from .time import TimeGenerator, SystemTimeSource
 from .node import NodeManager
+from .libc import compute_md5
 
 
 struct Generator:
@@ -88,3 +89,25 @@ struct Generator:
         bytes[15] = node_id[5]
 
         return UUID(bytes)
+
+    def v3(mut self, namespace: UUID, name: String) -> UUID:
+        var namespace_bytes = namespace.to_bytes()
+        var name_bytes = name.as_bytes()
+
+        var buf = List[UInt8]()
+        for i in range(len(namespace_bytes)):
+            buf.append(namespace_bytes[i])
+
+        for byte in name_bytes:
+            buf.append(byte)
+
+        var md5_hash = compute_md5(buf)
+
+        md5_hash[6] = UInt8(
+            (md5_hash[6] & 0x0F) | 0x30
+        )  # Set UUID version to 3
+        md5_hash[8] = UInt8(
+            (md5_hash[8] & 0x3F) | 0x80
+        )  # Set UUID variant to RFC
+
+        return UUID(md5_hash)

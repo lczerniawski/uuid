@@ -2,10 +2,12 @@ from uuid.libc import (
     get_real_time_ns,
     get_secure_random_u16,
     get_secure_random_u64,
+    compute_md5,
 )
 from std.collections import Set
 from std.testing import (
     assert_true,
+    assert_equal,
     TestSuite,
 )
 
@@ -139,6 +141,117 @@ def test_secure_random_u64_consecutive_calls_differ() raises:
             different = True
             break
     assert_true(different)
+
+
+comptime md5_empty = SIMD[DType.uint8, 16](
+    0xD4,
+    0x1D,
+    0x8C,
+    0xD9,
+    0x8F,
+    0x00,
+    0xB2,
+    0x04,
+    0xE9,
+    0x80,
+    0x09,
+    0x98,
+    0xEC,
+    0xF8,
+    0x42,
+    0x7E,
+)
+
+comptime md5_abc = SIMD[DType.uint8, 16](
+    0x90,
+    0x01,
+    0x50,
+    0x98,
+    0x3C,
+    0xD2,
+    0x4F,
+    0xB0,
+    0xD6,
+    0x96,
+    0x3F,
+    0x7D,
+    0x28,
+    0xE1,
+    0x7F,
+    0x72,
+)
+
+comptime md5_quick_brown_fox = SIMD[DType.uint8, 16](
+    0x9E,
+    0x10,
+    0x7D,
+    0x9D,
+    0x37,
+    0x2B,
+    0xB6,
+    0x82,
+    0x6B,
+    0xD8,
+    0x1D,
+    0x35,
+    0x42,
+    0xA4,
+    0x19,
+    0xD6,
+)
+
+comptime md5_long_message = SIMD[DType.uint8, 16](
+    0x36,
+    0xA9,
+    0x2C,
+    0xC9,
+    0x4A,
+    0x9E,
+    0x0F,
+    0xA2,
+    0x1F,
+    0x62,
+    0x5F,
+    0x8B,
+    0xFB,
+    0x00,
+    0x7A,
+    0xDF,
+)
+
+
+def test_compute_md5_empty_string() raises:
+    var result = compute_md5("".as_bytes())
+    assert_equal(result, md5_empty)
+
+
+def test_compute_md5_abc() raises:
+    var result = compute_md5("abc".as_bytes())
+    assert_equal(result, md5_abc)
+
+
+def test_compute_md5_quick_brown_fox() raises:
+    var result = compute_md5(
+        "The quick brown fox jumps over the lazy dog".as_bytes()
+    )
+    assert_equal(result, md5_quick_brown_fox)
+
+
+def test_compute_md5_is_deterministic() raises:
+    var first = compute_md5("hello world".as_bytes())
+    var second = compute_md5("hello world".as_bytes())
+    assert_equal(first, second)
+
+
+def test_compute_md5_changes_for_different_inputs() raises:
+    var first = compute_md5("hello".as_bytes())
+    var second = compute_md5("world".as_bytes())
+    assert_true(first != second)
+
+
+def test_compute_md5_long_input_spans_multiple_blocks() raises:
+    var result = compute_md5(("a" * 100).as_bytes())
+    assert_equal(result, md5_long_message)
 
 
 def main() raises:
