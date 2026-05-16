@@ -1,4 +1,4 @@
-from uuid import UUID, UUIDVersion
+from uuid import UUID, Version, Variant
 from std.testing import (
     assert_equal,
     assert_false,
@@ -26,6 +26,18 @@ comptime raw_data = SIMD[DType.uint8, 16](
     0xE0,
     0xC8,  # Segment 5: bb680e5fe0c8
 )
+
+
+def _uuid_with_version(version: UInt8) -> UUID:
+    var bytes = raw_data
+    bytes[6] = (bytes[6] & 0x0F) | (version << 4)
+    return UUID(bytes)
+
+
+def _uuid_with_variant(variant_prefix: UInt8) -> UUID:
+    var bytes = raw_data
+    bytes[8] = (bytes[8] & 0x1F) | variant_prefix
+    return UUID(bytes)
 
 
 def test_uuid_parses_from_init_to_valid_string() raises:
@@ -101,10 +113,109 @@ def test_uuid_parses_from_uppercase_string_to_valid_lowercase_string() raises:
 
 
 def test_version_is_equal_to_4() raises:
-    comptime expected = UUIDVersion.v4
+    comptime expected = Version.v4
 
     var uuid = UUID(raw_data)
     var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_version_is_equal_to_1() raises:
+    comptime expected = Version.v1
+
+    var uuid = _uuid_with_version(expected)
+    var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_version_is_equal_to_2() raises:
+    comptime expected = Version.v2
+
+    var uuid = _uuid_with_version(expected)
+    var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_version_is_equal_to_3() raises:
+    comptime expected = Version.v3
+
+    var uuid = _uuid_with_version(expected)
+    var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_version_is_equal_to_5() raises:
+    comptime expected = Version.v5
+
+    var uuid = _uuid_with_version(expected)
+    var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_version_is_equal_to_6() raises:
+    comptime expected = Version.v6
+
+    var uuid = _uuid_with_version(expected)
+    var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_version_is_equal_to_7() raises:
+    comptime expected = Version.v7
+
+    var uuid = _uuid_with_version(expected)
+    var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_version_is_equal_to_8() raises:
+    comptime expected = Version.v8
+
+    var uuid = _uuid_with_version(expected)
+    var result = uuid.version()
+
+    assert_equal(expected, result.value)
+
+
+def test_variant_is_equal_to_RFC9562() raises:
+    comptime expected = Variant.RFC9562
+
+    var uuid = UUID(raw_data)
+    var result = uuid.variant()
+
+    assert_equal(expected, result.value)
+
+
+def test_variant_is_equal_to_NCS() raises:
+    comptime expected = Variant.NCS
+
+    var uuid = _uuid_with_variant(0x00)
+    var result = uuid.variant()
+
+    assert_equal(expected, result.value)
+
+
+def test_variant_is_equal_to_Microsoft() raises:
+    comptime expected = Variant.Microsoft
+
+    var uuid = _uuid_with_variant(0xC0)
+    var result = uuid.variant()
+
+    assert_equal(expected, result.value)
+
+
+def test_variant_is_equal_to_Future() raises:
+    comptime expected = Variant.Future
+
+    var uuid = _uuid_with_variant(0xE0)
+    var result = uuid.variant()
 
     assert_equal(expected, result.value)
 

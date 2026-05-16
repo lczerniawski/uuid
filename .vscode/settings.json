@@ -4,10 +4,17 @@
     "src"
   ],
   "cSpell.words": [
+    "buflen",
     "comptime",
     "elif",
     "fieldwise",
+    "getrandom",
+    "gettime",
+    "libc",
+    "nsec",
     "repr",
-    "staticmethod"
+    "ssize",
+    "staticmethod",
+    "timespec"
   ]
 }

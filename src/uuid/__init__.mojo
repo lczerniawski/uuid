@@ -1,1 +1,2 @@
-from .uuid import UUID, UUIDVersion
+from .uuid import UUID, Version, Variant
+from .generator import Generator
