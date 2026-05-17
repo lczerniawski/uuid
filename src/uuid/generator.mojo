@@ -1,7 +1,7 @@
 from .uuid import UUID
 from .time import TimeGenerator, SystemTimeSource
 from .node import NodeManager
-from .libc import compute_md5, get_secure_random_u128
+from .libc import compute_md5, compute_sha1, get_secure_random_u128
 
 
 struct Generator:
@@ -161,5 +161,40 @@ struct Generator:
         bytes[13] = UInt8((random_bytes >> 16) & 0xFF)
         bytes[14] = UInt8((random_bytes >> 8) & 0xFF)
         bytes[15] = UInt8(random_bytes & 0xFF)
+
+        return UUID(bytes)
+
+    def v5(mut self, namespace: UUID, name: String) -> UUID:
+        """
+        Generate a version 5 UUID.
+
+        The UUID is derived from the provided namespace UUID and name using
+        a SHA-1 hash, with the version and variant bits set to RFC values.
+
+        Args:
+            namespace: The UUID that defines the namespace for this name-based UUID.
+            name: The name from which to generate the UUID, typically a string.
+
+        Returns:
+            `UUID`: A newly generated version 5 UUID.
+        """
+        var namespace_bytes = namespace.to_bytes()
+        var name_bytes = name.as_bytes()
+
+        var bytes_to_hash = List[UInt8]()
+        for i in range(len(namespace_bytes)):
+            bytes_to_hash.append(namespace_bytes[i])
+
+        for byte in name_bytes:
+            bytes_to_hash.append(byte)
+
+        var sha_hash = compute_sha1(bytes_to_hash)
+
+        var bytes = SIMD[DType.uint8, 16](0)
+        for i in range(len(bytes)):
+            bytes[i] = sha_hash[i]
+
+        bytes[6] = (bytes[6] & 0x0F) | 0x50  # Set UUID version to 5
+        bytes[8] = (bytes[8] & 0x3F) | 0x80  # Set UUID variant to RFC
 
         return UUID(bytes)

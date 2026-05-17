@@ -29,6 +29,7 @@ def get_real_time_ns() raises -> UInt64:
         `Error`: If the underlying system call fails to retrieve the time.
     """
     var ts = timespec(0, 0)
+    # Definition: int clock_gettime(clockid_t clk_id, struct timespec *tp);
     var success = external_call["clock_gettime", Int32](
         clock_realtime, Pointer(to=ts)
     )
@@ -151,6 +152,9 @@ def compute_md5(data: Span[UInt8, ...]) -> SIMD[DType.uint8, 16]:
     """
     Compute MD5 hash of input string.
 
+    Args:
+        data: Input data to hash as a byte span.
+
     Returns:
         `SIMD[DType.uint8, 16]`: 16-byte MD5 hash.
     """
@@ -161,7 +165,8 @@ def compute_md5(data: Span[UInt8, ...]) -> SIMD[DType.uint8, 16]:
         var data_ptr = data.unsafe_ptr()
         var data_len = len(data)
 
-        _ = external_call["MD5", OwnedPointer[UInt8]](
+        # Definition: unsigned char *MD5(const unsigned char *d, size_t n, unsigned char *md);
+        external_call["MD5", NoneType](
             data_ptr, UInt(data_len), Pointer(to=result)
         )
         return result
@@ -172,6 +177,7 @@ def compute_md5(data: Span[UInt8, ...]) -> SIMD[DType.uint8, 16]:
         var data_ptr = data.unsafe_ptr()
         var data_len = len(data)
 
+        # Definition: unsigned char *CC_MD5(const void *data, CC_LONG len, unsigned char *md);
         external_call["CC_MD5", NoneType](
             data_ptr, UInt32(data_len), Pointer(to=result)
         )
@@ -180,4 +186,41 @@ def compute_md5(data: Span[UInt8, ...]) -> SIMD[DType.uint8, 16]:
     else:
         compilation_target.unsupported_target_error[
             note="Unsupported OS: Computing MD5 hash not implemented"
+        ]()
+
+
+def compute_sha1(data: Span[UInt8, ...]) -> SIMD[DType.uint8, 20]:
+    """
+    Compute SHA-1 hash of input string.
+
+    Args:
+        data: Input data to hash as a byte span.
+
+    Returns:
+        `SIMD[DType.uint8, 20]`: 20-byte SHA-1.
+    """
+    comptime compilation_target = CompilationTarget()
+    comptime if compilation_target.is_linux():
+        var result = SIMD[DType.uint8, 20](0)
+        var data_ptr = data.unsafe_ptr()
+        var data_len = len(data)
+
+        # Definition: unsigned char *SHA1(const unsigned char *d, size_t n, unsigned char *md);
+        external_call["SHA1", NoneType](
+            data_ptr, UInt(data_len), Pointer(to=result)
+        )
+        return result
+    elif compilation_target.is_macos():
+        var result = SIMD[DType.uint8, 20](0)
+        var data_ptr = data.unsafe_ptr()
+        var data_len = len(data)
+
+        # Definition: unsigned char *CC_SHA1(const void *data, CC_LONG len, unsigned char *md);
+        external_call["CC_SHA1", NoneType](
+            data_ptr, UInt32(data_len), Pointer(to=result)
+        )
+        return result
+    else:
+        compilation_target.unsupported_target_error[
+            note="Unsupported OS: Computing SHA-1 hash not implemented"
         ]()

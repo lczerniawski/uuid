@@ -4,6 +4,7 @@ from uuid.libc import (
     get_secure_random_u64,
     get_secure_random_u128,
     compute_md5,
+    compute_sha1,
 )
 from std.collections import Set
 from std.testing import (
@@ -288,6 +289,105 @@ def test_compute_md5_changes_for_different_inputs() raises:
 def test_compute_md5_long_input_spans_multiple_blocks() raises:
     var result = compute_md5(("a" * 100).as_bytes())
     assert_equal(result, md5_long_message)
+
+
+comptime sha1_empty = SIMD[DType.uint8, 20](
+    0xDA,
+    0x39,
+    0xA3,
+    0xEE,
+    0x5E,
+    0x6B,
+    0x4B,
+    0x0D,
+    0x32,
+    0x55,
+    0xBF,
+    0xEF,
+    0x95,
+    0x60,
+    0x18,
+    0x90,
+    0xAF,
+    0xD8,
+    0x07,
+    0x09,
+)
+
+comptime sha1_abc = SIMD[DType.uint8, 20](
+    0xA9,
+    0x99,
+    0x3E,
+    0x36,
+    0x47,
+    0x06,
+    0x81,
+    0x6A,
+    0xBA,
+    0x3E,
+    0x25,
+    0x71,
+    0x78,
+    0x50,
+    0xC2,
+    0x6C,
+    0x9C,
+    0xD0,
+    0xD8,
+    0x9D,
+)
+
+comptime sha1_quick_brown_fox = SIMD[DType.uint8, 20](
+    0x2F,
+    0xD4,
+    0xE1,
+    0xC6,
+    0x7A,
+    0x2D,
+    0x28,
+    0xFC,
+    0xED,
+    0x84,
+    0x9E,
+    0xE1,
+    0xBB,
+    0x76,
+    0xE7,
+    0x39,
+    0x1B,
+    0x93,
+    0xEB,
+    0x12,
+)
+
+
+def test_compute_sha1_empty_string() raises:
+    var result = compute_sha1("".as_bytes())
+    assert_equal(result, sha1_empty)
+
+
+def test_compute_sha1_abc() raises:
+    var result = compute_sha1("abc".as_bytes())
+    assert_equal(result, sha1_abc)
+
+
+def test_compute_sha1_quick_brown_fox() raises:
+    var result = compute_sha1(
+        "The quick brown fox jumps over the lazy dog".as_bytes()
+    )
+    assert_equal(result, sha1_quick_brown_fox)
+
+
+def test_compute_sha1_is_deterministic() raises:
+    var first = compute_sha1("hello world".as_bytes())
+    var second = compute_sha1("hello world".as_bytes())
+    assert_equal(first, second)
+
+
+def test_compute_sha1_changes_for_different_inputs() raises:
+    var first = compute_sha1("hello".as_bytes())
+    var second = compute_sha1("world".as_bytes())
+    assert_true(first != second)
 
 
 def main() raises:
