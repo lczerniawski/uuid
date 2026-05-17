@@ -55,6 +55,10 @@ struct ValidationError(ImplicitlyCopyable, Writable):
     var reason: String
 
 
+comptime Nil_UUID = UUID(SIMD[DType.uint8, 16](0))
+comptime Max_UUID = UUID(SIMD[DType.uint8, 16](0xFF))
+
+
 struct UUID(Equatable, ImplicitlyCopyable, Writable):
     """
     Canonical 16-byte UUID value.
