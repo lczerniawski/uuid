@@ -232,5 +232,64 @@ def test_generated_v3_uuid_sets_raw_version_and_variant_bits() raises:
     assert_equal(Int(uuid.bytes[8] >> 6), 2)
 
 
+def test_generator_generates_non_zero_v4_uuid() raises:
+    var zero = UUID(SIMD[DType.uint8, 16](0))
+
+    var generator = Generator()
+    var uuid = generator.v4()
+
+    assert_not_equal(uuid, zero)
+
+
+def test_generator_generates_different_v4_uuid_each_time() raises:
+    var generator = Generator()
+    var first_uuid = generator.v4()
+    var second_uuid = generator.v4()
+
+    assert_not_equal(first_uuid, second_uuid)
+
+
+def test_generated_v4_uuid_is_correct_uuid_created_from_string() raises:
+    var generator = Generator()
+    var uuid = generator.v4()
+
+    var new_uuid = UUID.from_string(String(uuid))
+    assert_equal(uuid, new_uuid)
+
+
+def test_generated_v4_uuid_is_correct_uuid_created_from_bytes() raises:
+    var generator = Generator()
+    var uuid = generator.v4()
+
+    var new_uuid = UUID.from_bytes(uuid.bytes)
+    assert_equal(uuid, new_uuid)
+
+
+def test_generated_v4_uuid_has_correct_version() raises:
+    var starter_uuid = UUID.from_string(dns_uuid)
+
+    var generator = Generator()
+    var uuid = generator.v4()
+
+    assert_equal(uuid.version(), Version.v4)
+
+
+def test_generated_v4_uuid_has_correct_variant() raises:
+    var starter_uuid = UUID.from_string(dns_uuid)
+
+    var generator = Generator()
+    var uuid = generator.v4()
+
+    assert_equal(uuid.variant(), Variant.RFC9562)
+
+
+def test_generated_v4_uuid_sets_raw_version_and_variant_bits() raises:
+    var generator = Generator()
+    var uuid = generator.v4()
+
+    assert_equal(Int(uuid.bytes[6] >> 4), 4)
+    assert_equal(Int(uuid.bytes[8] >> 6), 2)
+
+
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

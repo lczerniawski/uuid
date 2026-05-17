@@ -1,7 +1,7 @@
 from .uuid import UUID
 from .time import TimeGenerator, SystemTimeSource
 from .node import NodeManager
-from .libc import compute_md5
+from .libc import compute_md5, get_secure_random_u128
 
 
 struct Generator:
@@ -91,6 +91,19 @@ struct Generator:
         return UUID(bytes)
 
     def v3(mut self, namespace: UUID, name: String) -> UUID:
+        """
+        Generate a version 3 UUID.
+
+        The UUID is derived from the provided namespace UUID and name using
+        an MD5 hash, with the version and variant bits set to RFC values.
+
+        Args:
+            namespace: The UUID that defines the namespace for this name-based UUID.
+            name: The name from which to generate the UUID, typically a string.
+
+        Returns:
+            `UUID`: A newly generated version 3 UUID.
+        """
         var namespace_bytes = namespace.to_bytes()
         var name_bytes = name.as_bytes()
 
@@ -111,3 +124,42 @@ struct Generator:
         )  # Set UUID variant to RFC
 
         return UUID(md5_hash)
+
+    def v4(mut self) raises -> UUID:
+        """
+        Generate a version 4 UUID.
+
+        The UUID is assembled from secure random bytes, then normalized by
+        setting the version and variant bits required by the RFC.
+
+        Returns:
+            `UUID`: A newly generated version 4 UUID.
+
+        Raises:
+            `Error`: If secure random bytes cannot be obtained.
+        """
+        var random_bytes = get_secure_random_u128()
+        var bytes = SIMD[DType.uint8, 16](0)
+
+        bytes[0] = UInt8((random_bytes >> 120) & 0xFF)
+        bytes[1] = UInt8((random_bytes >> 112) & 0xFF)
+        bytes[2] = UInt8((random_bytes >> 104) & 0xFF)
+        bytes[3] = UInt8((random_bytes >> 96) & 0xFF)
+        bytes[4] = UInt8((random_bytes >> 88) & 0xFF)
+        bytes[5] = UInt8((random_bytes >> 80) & 0xFF)
+        bytes[6] = (
+            UInt8((random_bytes >> 72) & 0xFF) & 0x0F
+        ) | 0x40  # Set UUID version to 4
+        bytes[7] = UInt8((random_bytes >> 64) & 0xFF)
+        bytes[8] = (
+            UInt8((random_bytes >> 56) & 0xFF) & 0x3F
+        ) | 0x80  # Set UUID variant to RFC
+        bytes[9] = UInt8((random_bytes >> 48) & 0xFF)
+        bytes[10] = UInt8((random_bytes >> 40) & 0xFF)
+        bytes[11] = UInt8((random_bytes >> 32) & 0xFF)
+        bytes[12] = UInt8((random_bytes >> 24) & 0xFF)
+        bytes[13] = UInt8((random_bytes >> 16) & 0xFF)
+        bytes[14] = UInt8((random_bytes >> 8) & 0xFF)
+        bytes[15] = UInt8(random_bytes & 0xFF)
+
+        return UUID(bytes)

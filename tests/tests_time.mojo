@@ -1,4 +1,9 @@
-from uuid.time import TimeGenerator, TimeSource, SystemTimeSource
+from uuid.time import (
+    TimeGenerator,
+    TimeSource,
+    SystemTimeSource,
+    gregorian_offset_ticks,
+)
 from uuid.libc import get_real_time_ns
 from std.testing import (
     assert_equal,
@@ -76,6 +81,17 @@ def test_get_clock_sequence_after_set_clock_sequence_with_value() raises:
     generator.set_clock_sequence(42)
 
     assert_equal(generator.get_clock_sequence(), 42)
+
+
+def test_next_uses_gregorian_offset_and_rfc_sequence_bits() raises:
+    var mock = MockTimeSource(1000)
+    var generator = TimeGenerator(time_source=mock)
+    generator.set_clock_sequence(0x1234)
+
+    var result = generator.next()
+
+    assert_equal(result.timestamp, 1000 + gregorian_offset_ticks)
+    assert_equal(result.sequence, UInt16(0x9234))
 
 
 def test_get_clock_sequence_constructor_random_is_in_range() raises:
