@@ -30,6 +30,20 @@ def _timestamp_from_uuid(u: UUID) -> UInt64:
     return (time_high << 48) | (time_mid << 32) | time_low
 
 
+def _timestamp_from_v6_uuid(u: UUID) -> UInt64:
+    var b = u.bytes
+    var time_high = UInt64(
+        (UInt32(b[0]) << 24)
+        | (UInt32(b[1]) << 16)
+        | (UInt32(b[2]) << 8)
+        | UInt32(b[3])
+    )
+    var time_mid = UInt64((UInt16(b[4]) << 8) | UInt16(b[5]))
+    var time_low_and_version = UInt64((UInt16(b[6]) << 8) | UInt16(b[7]))
+    var time_low = time_low_and_version & UInt64(0x0FFF)
+    return (time_high << 28) | (time_mid << 12) | time_low
+
+
 def test_generator_generates_non_zero_v1_uuid() raises:
     var zero = UUID(SIMD[DType.uint8, 16](0))
 
@@ -424,6 +438,77 @@ def test_generated_v5_uuid_sets_raw_version_and_variant_bits() raises:
 
     assert_equal(Int(uuid.bytes[6] >> 4), 5)
     assert_equal(Int(uuid.bytes[8] >> 6), 2)
+
+
+def test_generator_generates_non_zero_v6_uuid() raises:
+    var zero = UUID(SIMD[DType.uint8, 16](0))
+
+    var generator = Generator()
+    var uuid = generator.v6()
+
+    assert_not_equal(uuid, zero)
+
+
+def test_generator_generates_different_v6_uuid() raises:
+    var generator = Generator()
+    var first_uuid = generator.v6()
+    var second_uuid = generator.v6()
+
+    assert_not_equal(first_uuid, second_uuid)
+
+
+def test_generated_v6_uuid_is_correct_uuid_created_from_string() raises:
+    var generator = Generator()
+    var uuid = generator.v6()
+
+    var new_uuid = UUID.from_string(String(uuid))
+    assert_equal(uuid, new_uuid)
+
+
+def test_generated_v6_uuid_is_correct_uuid_created_from_bytes() raises:
+    var generator = Generator()
+    var uuid = generator.v6()
+
+    var new_uuid = UUID.from_bytes(uuid.bytes)
+    assert_equal(uuid, new_uuid)
+
+
+def test_generated_v6_uuid_has_correct_version() raises:
+    var generator = Generator()
+    var uuid = generator.v6()
+
+    assert_equal(uuid.version(), Version.v6)
+
+
+def test_generated_v6_uuid_has_correct_variant() raises:
+    var generator = Generator()
+    var uuid = generator.v6()
+
+    assert_equal(uuid.variant(), Variant.RFC9562)
+
+
+def test_generated_v6_uuid_sets_raw_version_and_variant_bits() raises:
+    var generator = Generator()
+    var uuid = generator.v6()
+
+    assert_equal(Int(uuid.bytes[6] >> 4), 6)
+    assert_equal(Int(uuid.bytes[8] >> 6), 2)
+
+
+def test_v6_timestamps_monotonic() raises:
+    var generator = Generator()
+    var prev_ts = UInt64(0)
+    for _ in range(100):
+        var uuid = generator.v6()
+        var ts = _timestamp_from_v6_uuid(uuid)
+        assert_true(ts >= prev_ts)
+        prev_ts = ts
+
+
+def test_v6_node_multicast_bit_set() raises:
+    var generator = Generator()
+    var uuid = generator.v6()
+    assert_equal(Int(uuid.bytes[10] & UInt8(1)), 1)
 
 
 def main() raises:

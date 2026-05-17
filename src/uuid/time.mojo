@@ -124,7 +124,7 @@ struct TimeGenerator[T: TimeSource]:
 
     def next(mut self) raises -> Time:
         """
-        Generate the next timestamp and clock-sequence pair.
+        Generate the next timestamp and clock-sequence pair used for UUID v1 generation.
 
         The current time is converted to Gregorian epoch ticks and compared with
         the previous value. If time does not advance, the clock sequence is
@@ -141,3 +141,15 @@ struct TimeGenerator[T: TimeSource]:
                 ) | 0x8000
             self.last_time = now
             return Time(now, self.clock_sequence)
+
+    def now_gregorian(self) raises -> UInt64:
+        """
+        Return the current time in Gregorian epoch ticks.
+
+        This is a convenience method that retrieves the current time from the
+        time source and converts it to the format used for UUID timestamps.
+
+        Returns:
+            `UInt64`: Current time in 100 ns ticks since the Gregorian epoch offset.
+        """
+        return self.time_source.now() + gregorian_offset_ticks

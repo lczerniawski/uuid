@@ -1,7 +1,13 @@
 from .uuid import UUID
 from .time import TimeGenerator, SystemTimeSource
 from .node import NodeManager
-from .libc import compute_md5, compute_sha1, get_secure_random_u128
+from .libc import (
+    compute_md5,
+    compute_sha1,
+    get_secure_random_u128,
+    get_secure_random_u16,
+    get_secure_random_u64,
+)
 
 
 struct Generator:
@@ -61,7 +67,9 @@ struct Generator:
 
         var time_low = UInt32(now & 0xFFFFFFFF)
         var time_mid = UInt16((now >> 32) & 0xFFFF)
-        var time_high_and_version = UInt16(((now >> 48) & 0x0FFF) | 0x1000)
+        var time_high_and_version = UInt16(
+            ((now >> 48) & 0x0FFF) | 0x1000
+        )  # Set UUID version to 1
         var clock_seq = time.sequence
         var node_id = self.node_manager.get_node_id()
 
@@ -196,5 +204,54 @@ struct Generator:
 
         bytes[6] = (bytes[6] & 0x0F) | 0x50  # Set UUID version to 5
         bytes[8] = (bytes[8] & 0x3F) | 0x80  # Set UUID variant to RFC
+
+        return UUID(bytes)
+
+    def v6(mut self) raises -> UUID:
+        """
+        Generate a version 6 UUID.
+
+        The UUID is assembled from the current timestamp, a secure random
+        clock sequence, and a secure random node identifier, with the version and variant bits set to RFC values.
+
+        Returns:
+            `UUID`: A newly generated version 6 UUID.
+        """
+        var now = self.time_generator.now_gregorian()
+
+        var time_high = UInt32((now >> 28) & 0xFFFFFFFF)
+        var time_mid = UInt16((now >> 12) & 0xFFFF)
+        var time_low_and_version = UInt16(
+            (now & 0x0FFF) | 0x6000
+        )  # Set UUID version to 6
+        var clock_seq = (
+            get_secure_random_u16() & 0x3FFF
+        ) | 0x8000  # Set UUID variant to RFC
+        var node_id = (
+            get_secure_random_u64() | (UInt64(1) << 40)
+        ) & 0x0000FFFFFFFFFFFF  # Set multicast bit for random node ID
+
+        var bytes = SIMD[DType.uint8, 16](0)
+
+        bytes[0] = UInt8((time_high >> 24) & 0xFF)
+        bytes[1] = UInt8((time_high >> 16) & 0xFF)
+        bytes[2] = UInt8((time_high >> 8) & 0xFF)
+        bytes[3] = UInt8(time_high & 0xFF)
+
+        bytes[4] = UInt8((time_mid >> 8) & 0xFF)
+        bytes[5] = UInt8(time_mid & 0xFF)
+
+        bytes[6] = UInt8((time_low_and_version >> 8) & 0xFF)
+        bytes[7] = UInt8(time_low_and_version & 0xFF)
+
+        bytes[8] = UInt8((clock_seq >> 8) & 0xFF)
+        bytes[9] = UInt8(clock_seq & 0xFF)
+
+        bytes[10] = UInt8((node_id >> 40) & 0xFF)
+        bytes[11] = UInt8((node_id >> 32) & 0xFF)
+        bytes[12] = UInt8((node_id >> 24) & 0xFF)
+        bytes[13] = UInt8((node_id >> 16) & 0xFF)
+        bytes[14] = UInt8((node_id >> 8) & 0xFF)
+        bytes[15] = UInt8(node_id & 0xFF)
 
         return UUID(bytes)

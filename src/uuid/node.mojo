@@ -3,7 +3,7 @@ from .libc import get_secure_random_u64
 
 struct NodeManager:
     """
-    Manage the node identifier used by time-based UUID generation.
+    Manage the node identifier used by time-based UUID v1 generation.
 
     The node value is initialized once from secure random bytes and then
     reused so UUIDs can carry a stable node identity.
