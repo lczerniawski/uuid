@@ -217,14 +217,14 @@ struct Generator:
         Returns:
             `UUID`: A newly generated version 6 UUID.
         """
-        var now = self.time_generator.now_gregorian()
+        var now = self.time_generator.now_gregorian_ticks()
 
         var time_high = UInt32((now >> 28) & 0xFFFFFFFF)
         var time_mid = UInt16((now >> 12) & 0xFFFF)
         var time_low_and_version = UInt16(
             (now & 0x0FFF) | 0x6000
         )  # Set UUID version to 6
-        var clock_seq = (
+        var clock_seq_with_version = (
             get_secure_random_u16() & 0x3FFF
         ) | 0x8000  # Set UUID variant to RFC
         var node_id = (
@@ -244,8 +244,8 @@ struct Generator:
         bytes[6] = UInt8((time_low_and_version >> 8) & 0xFF)
         bytes[7] = UInt8(time_low_and_version & 0xFF)
 
-        bytes[8] = UInt8((clock_seq >> 8) & 0xFF)
-        bytes[9] = UInt8(clock_seq & 0xFF)
+        bytes[8] = UInt8((clock_seq_with_version >> 8) & 0xFF)
+        bytes[9] = UInt8(clock_seq_with_version & 0xFF)
 
         bytes[10] = UInt8((node_id >> 40) & 0xFF)
         bytes[11] = UInt8((node_id >> 32) & 0xFF)
@@ -253,5 +253,37 @@ struct Generator:
         bytes[13] = UInt8((node_id >> 16) & 0xFF)
         bytes[14] = UInt8((node_id >> 8) & 0xFF)
         bytes[15] = UInt8(node_id & 0xFF)
+
+        return UUID(bytes)
+
+    def v7(mut self) raises -> UUID:
+        var unix_ms = self.time_generator.now_unix_ms() & 0x0000FFFFFFFFFFFF
+        var rand_a_with_version = (
+            get_secure_random_u16() & 0x0FFF
+        ) | 0x7000  # Set UUID version to 7
+        var rand_b_with_variant = (
+            get_secure_random_u64() & 0x3FFFFFFFFFFFFFFF
+        ) | 0x8000000000000000  # Set UUID variant to RFC
+
+        var bytes = SIMD[DType.uint8, 16](0)
+
+        bytes[0] = UInt8((unix_ms >> 40) & 0xFF)
+        bytes[1] = UInt8((unix_ms >> 32) & 0xFF)
+        bytes[2] = UInt8((unix_ms >> 24) & 0xFF)
+        bytes[3] = UInt8((unix_ms >> 16) & 0xFF)
+        bytes[4] = UInt8((unix_ms >> 8) & 0xFF)
+        bytes[5] = UInt8(unix_ms & 0xFF)
+
+        bytes[6] = UInt8((rand_a_with_version >> 8) & 0xFF)
+        bytes[7] = UInt8(rand_a_with_version & 0xFF)
+
+        bytes[8] = UInt8((rand_b_with_variant >> 56) & 0xFF)
+        bytes[9] = UInt8((rand_b_with_variant >> 48) & 0xFF)
+        bytes[10] = UInt8((rand_b_with_variant >> 40) & 0xFF)
+        bytes[11] = UInt8((rand_b_with_variant >> 32) & 0xFF)
+        bytes[12] = UInt8((rand_b_with_variant >> 24) & 0xFF)
+        bytes[13] = UInt8((rand_b_with_variant >> 16) & 0xFF)
+        bytes[14] = UInt8((rand_b_with_variant >> 8) & 0xFF)
+        bytes[15] = UInt8(rand_b_with_variant & 0xFF)
 
         return UUID(bytes)

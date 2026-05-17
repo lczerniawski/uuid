@@ -14,8 +14,7 @@ trait TimeSource(TrivialRegisterPassable):
     """
     Time source interface used by the UUID time generator.
 
-    Implementations must return the current time in nanoseconds so the
-    generator can convert it into Gregorian epoch ticks.
+    Implementations must return the current time in nanoseconds. 
     """
 
     def now(self) raises -> UInt64:
@@ -142,7 +141,7 @@ struct TimeGenerator[T: TimeSource]:
             self.last_time = now
             return Time(now, self.clock_sequence)
 
-    def now_gregorian(self) raises -> UInt64:
+    def now_gregorian_ticks(self) raises -> UInt64:
         """
         Return the current time in Gregorian epoch ticks.
 
@@ -153,3 +152,15 @@ struct TimeGenerator[T: TimeSource]:
             `UInt64`: Current time in 100 ns ticks since the Gregorian epoch offset.
         """
         return self.time_source.now() + gregorian_offset_ticks
+    
+    def now_unix_ms(self) raises -> UInt64:
+        """
+        Return the current time in Unix epoch milliseconds.
+
+        This is a convenience method that retrieves the current time from the
+        time source and converts it to milliseconds since the Unix epoch.
+
+        Returns:
+            `UInt64`: Current time in milliseconds since the Unix epoch.
+        """
+        return self.time_source.now() / 1_000_000
