@@ -1,3 +1,7 @@
+comptime Nil = UUID(SIMD[DType.uint8, 16](0))
+comptime Max = UUID(SIMD[DType.uint8, 16](0xFF))
+
+
 struct Version(Equatable, Writable):
     """
     UUID version discriminator.
@@ -53,10 +57,6 @@ struct ValidationError(ImplicitlyCopyable, Writable):
     """
 
     var reason: String
-
-
-comptime Nil_UUID = UUID(SIMD[DType.uint8, 16](0))
-comptime Max_UUID = UUID(SIMD[DType.uint8, 16](0xFF))
 
 
 struct UUID(Equatable, ImplicitlyCopyable, Writable):
