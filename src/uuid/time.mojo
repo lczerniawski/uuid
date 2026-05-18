@@ -14,7 +14,7 @@ trait TimeSource(TrivialRegisterPassable):
     """
     Time source interface used by the UUID time generator.
 
-    Implementations must return the current time in nanoseconds. 
+    Implementations must return the current time in nanoseconds.
     """
 
     def now(self) raises -> UInt64:
@@ -152,7 +152,7 @@ struct TimeGenerator[T: TimeSource]:
             `UInt64`: Current time in 100 ns ticks since the Gregorian epoch offset.
         """
         return self.time_source.now() + gregorian_offset_ticks
-    
+
     def now_unix_ms(self) raises -> UInt64:
         """
         Return the current time in Unix epoch milliseconds.

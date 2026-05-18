@@ -301,10 +301,10 @@ struct Generator:
 
         Args:
             custom_a: A 6-byte array of application-specific data (octets 0-5).
-            custom_b: A 2-byte array of application-specific data; only the lower 12 bits are used as 
+            custom_b: A 2-byte array of application-specific data; only the lower 12 bits are used as
                     application data (bits 52-63). Upper 4 bits are masked.
-            custom_c: A 8-byte array of application-specific data; the first byte uses lower 6 bits, remaining 
-                    7 bytes fully used (62 bits total, bits 66-127). Upper 2 bits 
+            custom_c: A 8-byte array of application-specific data; the first byte uses lower 6 bits, remaining
+                    7 bytes fully used (62 bits total, bits 66-127). Upper 2 bits
                     of first byte are masked and set for variant field.
 
         Returns:
