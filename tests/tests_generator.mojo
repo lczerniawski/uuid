@@ -594,5 +594,102 @@ def test_v7_timestamps_monotonic() raises:
         prev = ts
 
 
+def test_generator_generates_non_zero_v8_uuid() raises:
+    var zero = UUID(SIMD[DType.uint8, 16](0))
+
+    var a = SIMD[DType.uint8, 6](255, 254, 253, 252, 251, 250)
+    var b = SIMD[DType.uint8, 2](249, 248)
+    var c = SIMD[DType.uint8, 8](247, 246, 245, 244, 243, 242, 241, 240)
+
+    var generator = Generator()
+    var uuid = generator.v8(a, b, c)
+
+    assert_not_equal(uuid, zero)
+
+
+def test_v8_uuid_is_correct_uuid_created_from_string() raises:
+    var a = SIMD[DType.uint8, 6](255, 254, 253, 252, 251, 250)
+    var b = SIMD[DType.uint8, 2](249, 248)
+    var c = SIMD[DType.uint8, 8](247, 246, 245, 244, 243, 242, 241, 240)
+
+    var generator = Generator()
+    var uuid = generator.v8(a, b, c)
+
+    var new_uuid = UUID.from_string(String(uuid))
+    assert_equal(uuid, new_uuid)
+
+
+def test_v8_uuid_is_correct_uuid_created_from_bytes() raises:
+    var a = SIMD[DType.uint8, 6](255, 254, 253, 252, 251, 250)
+    var b = SIMD[DType.uint8, 2](249, 248)
+    var c = SIMD[DType.uint8, 8](247, 246, 245, 244, 243, 242, 241, 240)
+
+    var generator = Generator()
+    var uuid = generator.v8(a, b, c)
+
+    var new_uuid = UUID.from_bytes(uuid.bytes)
+    assert_equal(uuid, new_uuid)
+
+
+def test_v8_uuid_has_correct_version() raises:
+    var a = SIMD[DType.uint8, 6](255, 254, 253, 252, 251, 250)
+    var b = SIMD[DType.uint8, 2](249, 248)
+    var c = SIMD[DType.uint8, 8](247, 246, 245, 244, 243, 242, 241, 240)
+
+    var generator = Generator()
+    var uuid = generator.v8(a, b, c)
+
+    assert_equal(uuid.version(), Version.v8)
+
+
+def test_v8_uuid_has_correct_variant() raises:
+    var a = SIMD[DType.uint8, 6](255, 254, 253, 252, 251, 250)
+    var b = SIMD[DType.uint8, 2](249, 248)
+    var c = SIMD[DType.uint8, 8](247, 246, 245, 244, 243, 242, 241, 240)
+
+    var generator = Generator()
+    var uuid = generator.v8(a, b, c)
+
+    assert_equal(uuid.variant(), Variant.RFC9562)
+
+
+def test_v8_uuid_sets_raw_version_and_variant_bits() raises:
+    var a = SIMD[DType.uint8, 6](255, 254, 253, 252, 251, 250)
+    var b = SIMD[DType.uint8, 2](249, 248)
+    var c = SIMD[DType.uint8, 8](247, 246, 245, 244, 243, 242, 241, 240)
+
+    var generator = Generator()
+    var uuid = generator.v8(a, b, c)
+
+    assert_equal(Int(uuid.bytes[6] >> 4), 8)
+    assert_equal(Int(uuid.bytes[8] >> 6), 2)
+
+
+def test_v8_uuid_matches_rfc_layout() raises:
+    var a = SIMD[DType.uint8, 6](16, 17, 18, 19, 20, 21)
+    var b = SIMD[DType.uint8, 2](1, 178)
+    var c = SIMD[DType.uint8, 8](195, 196, 197, 198, 199, 200, 201, 202)
+
+    var generator = Generator()
+    var uuid = generator.v8(a, b, c)
+
+    assert_equal(Int(uuid.bytes[0]), 16)
+    assert_equal(Int(uuid.bytes[1]), 17)
+    assert_equal(Int(uuid.bytes[2]), 18)
+    assert_equal(Int(uuid.bytes[3]), 19)
+    assert_equal(Int(uuid.bytes[4]), 20)
+    assert_equal(Int(uuid.bytes[5]), 21)
+    assert_equal(Int(uuid.bytes[6]), 129)
+    assert_equal(Int(uuid.bytes[7]), 178)
+    assert_equal(Int(uuid.bytes[8]), 131)
+    assert_equal(Int(uuid.bytes[9]), 196)
+    assert_equal(Int(uuid.bytes[10]), 197)
+    assert_equal(Int(uuid.bytes[11]), 198)
+    assert_equal(Int(uuid.bytes[12]), 199)
+    assert_equal(Int(uuid.bytes[13]), 200)
+    assert_equal(Int(uuid.bytes[14]), 201)
+    assert_equal(Int(uuid.bytes[15]), 202)
+
+
 def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

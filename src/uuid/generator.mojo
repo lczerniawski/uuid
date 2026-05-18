@@ -287,3 +287,48 @@ struct Generator:
         bytes[15] = UInt8(rand_b_with_variant & 0xFF)
 
         return UUID(bytes)
+
+    def v8(
+        mut self,
+        var custom_a: SIMD[DType.uint8, 6],
+        var custom_b: SIMD[DType.uint8, 2],
+        var custom_c: SIMD[DType.uint8, 8],
+    ) -> UUID:
+        """
+        Generate a version 8 UUID with custom fields.
+
+        The UUID is assembled from the provided custom fields, with the version and variant bits set to RFC values.
+
+        Args:
+            custom_a: A 6-byte array of application-specific data (octets 0-5).
+            custom_b: A 2-byte array of application-specific data; only the lower 12 bits are used as 
+                    application data (bits 52-63). Upper 4 bits are masked.
+            custom_c: A 8-byte array of application-specific data; the first byte uses lower 6 bits, remaining 
+                    7 bytes fully used (62 bits total, bits 66-127). Upper 2 bits 
+                    of first byte are masked and set for variant field.
+
+        Returns:
+            `UUID`: A newly generated version 8 UUID.
+        """
+        var bytes = SIMD[DType.uint8, 16](0)
+
+        bytes[0] = custom_a[0]
+        bytes[1] = custom_a[1]
+        bytes[2] = custom_a[2]
+        bytes[3] = custom_a[3]
+        bytes[4] = custom_a[4]
+        bytes[5] = custom_a[5]
+
+        bytes[6] = (custom_b[0] & 0x0F) | 0x80  # Set UUID version to 8
+        bytes[7] = custom_b[1]
+
+        bytes[8] = (custom_c[0] & 0x3F) | 0x80  # Set UUID variant to RFC
+        bytes[9] = custom_c[1]
+        bytes[10] = custom_c[2]
+        bytes[11] = custom_c[3]
+        bytes[12] = custom_c[4]
+        bytes[13] = custom_c[5]
+        bytes[14] = custom_c[6]
+        bytes[15] = custom_c[7]
+
+        return UUID(bytes)
