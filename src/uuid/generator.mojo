@@ -30,7 +30,7 @@ struct Generator:
 
     def get_clock_sequence(mut self) -> Int:
         """
-        Return the currently configured clock sequence.
+        Return the currently configured clock sequence for UUID v1 generation.
 
         Returns:
             `Int`: The RFC 4122 clock-sequence value.
@@ -39,7 +39,7 @@ struct Generator:
 
     def set_clock_sequence(mut self, sequence: Int) raises:
         """
-        Update the clock sequence used for time-based UUID generation.
+        Update the clock sequence used for time-based UUID v1 generation.
 
         Args:
             sequence: The new clock sequence value to apply.
