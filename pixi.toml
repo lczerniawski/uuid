@@ -2,12 +2,16 @@
 authors = ["Lukasz Czerniawski <l.czerniawski@icloud.com>"]
 channels = ["https://conda.modular.com/max", "conda-forge"]
 name = "uuid"
-description = "A small Mojo library for generating, parsing, validating, and formatting UUID values in RFC-9562 compatible string forms."
+description = "A high-performance Mojo library for generating, parsing, validating, and formatting UUID values in RFC-9562 compatible string forms."
+license = "MIT"
 platforms = ["osx-arm64", "linux-64", "linux-aarch64"]
-version = "0.1.0"
+readme = "README.md"
+version = "1.0.0"
 
 [tasks]
+build = "mojo package src/uuid -o uuid.mojopkg"
 test = "sh scripts/run_tests.sh"
+format = "mojo format src/uuid"
 
 [dependencies]
 mojo = ">=1.0.0b1,<2"
