@@ -14,8 +14,8 @@ struct timespec(TrivialRegisterPassable):
     wrapper.
     """
 
-    var tv_sec: Int
-    var tv_nsec: Int
+        var tv_sec: Int
+        var tv_nsec: Int
 
 
 def get_real_time_ns() raises -> UInt64:
@@ -31,7 +31,7 @@ def get_real_time_ns() raises -> UInt64:
     var ts = timespec(0, 0)
     # Definition: int clock_gettime(clockid_t clk_id, struct timespec *tp);
     var success = external_call["clock_gettime", Int32](
-        clock_realtime, Pointer(to=ts)
+        Int32(clock_realtime), Pointer(to=ts)
     )
     if success != 0:
         raise Error("clock_gettime failed")
@@ -146,7 +146,6 @@ def get_secure_random_u128() raises -> UInt128:
         compilation_target.unsupported_target_error[
             note="Unsupported OS: Secure random not implemented"
         ]()
-
 
 def compute_md5(data: Span[UInt8, ...]) -> SIMD[DType.uint8, 16]:
     """
