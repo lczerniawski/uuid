@@ -2,11 +2,13 @@ from .uuid import UUID
 from .time import TimeGenerator, SystemTimeSource
 from .node import NodeManager
 from .libc import (
-    compute_md5,
-    compute_sha1,
     get_secure_random_u128,
     get_secure_random_u16,
     get_secure_random_u64,
+)
+from .crypto import (
+    compute_md5,
+    compute_sha1,
 )
 
 

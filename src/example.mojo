@@ -1,8 +1,9 @@
 from uuid import Generator
 
+
 def main() raises:
     # Create new Generator object, for UUID v1 Generation this one should be kept as a singleton, due to the need for state.
-    # For all the other cases, it can be recreated as needed, but for simplification it is advised to create it once and reuse for whole application lifetime. 
+    # For all the other cases, it can be recreated as needed, but for simplification it is advised to create it once and reuse for whole application lifetime.
     var generator = Generator()
 
     # Generate a random (version 4) UUID and print it.
