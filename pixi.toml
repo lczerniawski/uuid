@@ -12,6 +12,7 @@ version = "1.0.0"
 build = "mojo package src/uuid -o uuid.mojopkg"
 test = "sh scripts/run_tests.sh"
 format = "mojo format src/uuid"
+build_rattler = "rattler-build build --recipe conda.recipe/recipe.yaml -c conda-forge -c https://conda.modular.com/max -c https://repo.prefix.dev/modular-community"
 
 [dependencies]
 mojo = ">=1.0.0b1,<2"
