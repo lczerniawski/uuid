@@ -9,11 +9,9 @@ A high-performance Mojo library for generating, parsing, validating, and formatt
 - **Multiple UUID Versions**: Supports UUID v1, v3, v4, v5, v6, v7, and v8 generation
 - **RFC-9562 Compliant**: Full compliance with the latest UUID specification
 - **String Parsing**: Parse UUIDs from multiple string formats (canonical, URN, hex, braced)
-- **Format Support**: Convert between binary, canonical string, and URN representations
+- **Different Formats Support**: Convert between binary, canonical string, and URN representations
 - **Validation**: Comprehensive validation for UUID strings before parsing
 - **Cross-Platform**: Support for macOS (arm64), Linux (x86_64, aarch64)
-- **Secure Random**: Uses platform-specific secure random sources (arc4random on macOS, getrandom on Linux)
-- **Zero Dependencies**: No external dependencies beyond Mojo standard library
 
 ### Supported UUID Versions
 
