@@ -334,19 +334,13 @@ The library is tested and supported on:
 - **Linux**: x86_64 (Intel/AMD)
 - **Linux**: aarch64 (ARM)
 
-Secure random number generation uses:
-
-- **macOS**: `arc4random()` from libc
-- **Linux**: `getrandom()` system call
-
-
 ## Package Structure
 
 - **`uuid.mojo`** - Core UUID type, parsing, formatting, and validation
 - **`generator.mojo`** - High-level UUID generator with support for v1-v8
 - **`time.mojo`** - Time source abstractions and timestamp management for time-based UUIDs
 - **`node.mojo`** - Node identifier management for v1 UUID generation
-- **`libc.mojo`** - FFI bindings to platform-specific system calls for random number generation and time retrieval
+- **`libc.mojo`** - FFI bindings to platform-specific system calls
 - **`__init__.mojo`** - Public API exports
 
 ## Development
