@@ -218,7 +218,7 @@ var uuid2 = gen.v1()
 # Each new generator resets the clock sequence
 ```
 
-#### Stateless Versions (v4, v6, v7)
+#### Stateless Versions (v3, v4, v5, v6, v7, v8)
 
 While these versions don't maintain state, it's still recommended to reuse a single generator instance for the lifetime of your application:
 
