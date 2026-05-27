@@ -1,8 +1,5 @@
 from uuid.libc import (
     get_real_time_ns,
-    get_secure_random_u16,
-    get_secure_random_u64,
-    get_secure_random_u128,
 )
 from std.collections import Set
 from std.testing import (
@@ -79,103 +76,6 @@ def test_get_real_time_ns_increases_short_loop() raises:
             increased = True
             break
     assert_true(increased)
-
-
-def test_get_secure_random_u16_returns_non_zero_value() raises:
-    var result = get_secure_random_u16()
-    assert_true(result != 0)
-
-
-def test_get_secure_random_u16_returns_non_zero_value_over_many_calls() raises:
-    for _ in range(1000):
-        var result = get_secure_random_u16()
-        assert_true(result != 0)
-
-
-def test_get_secure_random_u16_within_bounds() raises:
-    var v = get_secure_random_u16()
-    assert_true(v <= UInt16(65_535))
-
-
-def test_get_secure_random_u16_diversity() raises:
-    var seen = Set[UInt16]()
-    for _ in range(256):
-        seen.add(get_secure_random_u16())
-    assert_true(len(seen) >= 200)
-
-
-def test_secure_random_many_quick_calls() raises:
-    for _ in range(10_000):
-        _ = get_secure_random_u16()
-    assert_true(True)
-
-
-def test_get_secure_random_u64_returns_non_zero_value() raises:
-    var result = get_secure_random_u64()
-    assert_true(result != 0)
-
-
-def test_get_secure_random_u64_returns_non_zero_value_over_many_calls() raises:
-    for _ in range(1000):
-        var result = get_secure_random_u64()
-        assert_true(result != 0)
-
-
-def test_get_secure_random_u64_within_bounds() raises:
-    var v = get_secure_random_u64()
-    assert_true(v <= UInt64(18_446_744_073_709_551_615))
-
-
-def test_get_secure_random_u64_diversity() raises:
-    var seen = Set[UInt64]()
-    for _ in range(256):
-        seen.add(get_secure_random_u64())
-    assert_true(len(seen) >= 250)
-
-
-def test_secure_random_u64_consecutive_calls_differ() raises:
-    var a = get_secure_random_u64()
-    var different = False
-    for _ in range(10):
-        if get_secure_random_u64() != a:
-            different = True
-            break
-    assert_true(different)
-
-
-def test_get_secure_random_u128_returns_non_zero_value() raises:
-    var result = get_secure_random_u128()
-    assert_true(result != 0)
-
-
-def test_get_secure_random_u128_returns_non_zero_value_over_many_calls() raises:
-    for _ in range(1000):
-        var result = get_secure_random_u128()
-        assert_true(result != 0)
-
-
-def test_get_secure_random_u128_within_bounds() raises:
-    var v = get_secure_random_u128()
-    assert_true(
-        v <= UInt128(340_282_366_920_938_463_463_374_607_431_768_211_455)
-    )
-
-
-def test_get_secure_random_u128_diversity() raises:
-    var seen = Set[UInt128]()
-    for _ in range(256):
-        seen.add(get_secure_random_u128())
-    assert_true(len(seen) >= 250)
-
-
-def test_secure_random_u128_consecutive_calls_differ() raises:
-    var a = get_secure_random_u128()
-    var different = False
-    for _ in range(10):
-        if get_secure_random_u128() != a:
-            different = True
-            break
-    assert_true(different)
 
 
 def main() raises:

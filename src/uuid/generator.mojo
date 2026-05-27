@@ -1,14 +1,14 @@
 from .uuid import UUID
 from .time import TimeGenerator, SystemTimeSource
 from .node import NodeManager
-from .libc import (
-    get_secure_random_u128,
-    get_secure_random_u16,
-    get_secure_random_u64,
+from crypto.random import (
+    generate_secure_u128,
+    generate_secure_u16,
+    generate_secure_u64,
 )
-from .crypto import (
-    compute_md5,
-    compute_sha1,
+from crypto.hashes import (
+    md5,
+    sha1,
 )
 
 
@@ -124,7 +124,7 @@ struct Generator:
         for byte in name_bytes:
             buf.append(byte)
 
-        var md5_hash = compute_md5(buf)
+        var md5_hash = md5(buf).to_bytes()
 
         md5_hash[6] = UInt8(
             (md5_hash[6] & 0x0F) | 0x30
@@ -133,7 +133,11 @@ struct Generator:
             (md5_hash[8] & 0x3F) | 0x80
         )  # Set UUID variant to RFC
 
-        return UUID(md5_hash)
+        var bytes = SIMD[DType.uint8, 16](0)
+        for i in range(len(bytes)):
+            bytes[i] = md5_hash[i]
+
+        return UUID(bytes)
 
     def v4(mut self) raises -> UUID:
         """
@@ -148,7 +152,7 @@ struct Generator:
         Raises:
             `Error`: If secure random bytes cannot be obtained.
         """
-        var random_bytes = get_secure_random_u128()
+        var random_bytes = generate_secure_u128()
         var bytes = SIMD[DType.uint8, 16](0)
 
         bytes[0] = UInt8((random_bytes >> 120) & 0xFF)
@@ -198,7 +202,7 @@ struct Generator:
         for byte in name_bytes:
             bytes_to_hash.append(byte)
 
-        var sha_hash = compute_sha1(bytes_to_hash)
+        var sha_hash = sha1(bytes_to_hash).to_bytes()
 
         var bytes = SIMD[DType.uint8, 16](0)
         for i in range(len(bytes)):
@@ -227,10 +231,10 @@ struct Generator:
             (now & 0x0FFF) | 0x6000
         )  # Set UUID version to 6
         var clock_seq_with_version = (
-            get_secure_random_u16() & 0x3FFF
+            generate_secure_u16() & 0x3FFF
         ) | 0x8000  # Set UUID variant to RFC
         var node_id = (
-            get_secure_random_u64() | (UInt64(1) << 40)
+            generate_secure_u64() | (UInt64(1) << 40)
         ) & 0x0000FFFFFFFFFFFF  # Set multicast bit for random node ID
 
         var bytes = SIMD[DType.uint8, 16](0)
@@ -261,10 +265,10 @@ struct Generator:
     def v7(mut self) raises -> UUID:
         var unix_ms = self.time_generator.now_unix_ms() & 0x0000FFFFFFFFFFFF
         var rand_a_with_version = (
-            get_secure_random_u16() & 0x0FFF
+            generate_secure_u16() & 0x0FFF
         ) | 0x7000  # Set UUID version to 7
         var rand_b_with_variant = (
-            get_secure_random_u64() & 0x3FFFFFFFFFFFFFFF
+            generate_secure_u64() & 0x3FFFFFFFFFFFFFFF
         ) | 0x8000000000000000  # Set UUID variant to RFC
 
         var bytes = SIMD[DType.uint8, 16](0)

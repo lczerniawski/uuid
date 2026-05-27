@@ -1,4 +1,5 @@
-from .libc import get_secure_random_u16, get_real_time_ns
+from .libc import get_real_time_ns
+from crypto.random import generate_secure_u16
 from std.utils import BlockingSpinLock, BlockingScopedLock
 
 comptime seconds_per_day = 86400
@@ -91,7 +92,7 @@ struct TimeGenerator[T: TimeSource]:
         self.time_source = time_source
         self.last_time = 0
 
-        var random_u16 = get_secure_random_u16()
+        var random_u16 = generate_secure_u16()
         self.clock_sequence = (random_u16 & 0x3FFF) | 0x8000
 
     def set_clock_sequence(mut self, sequence: Int) raises:

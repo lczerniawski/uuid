@@ -1,6 +1,10 @@
 [workspace]
 authors = ["Lukasz Czerniawski <l.czerniawski@icloud.com>"]
-channels = ["https://conda.modular.com/max", "conda-forge"]
+channels = [
+    "https://conda.modular.com/max",
+    "https://repo.prefix.dev/modular-community",
+    "conda-forge",
+]
 name = "uuid"
 description = "A high-performance Mojo library for generating, parsing, validating, and formatting UUID values in RFC-9562 compatible string forms."
 license = "MIT"
@@ -16,3 +20,4 @@ build_rattler = "rattler-build build --recipe conda.recipe/recipe.yaml -c conda-
 
 [dependencies]
 mojo = ">=1.0.0b1,<2"
+crypto = ">=0.1.0,<0.2"

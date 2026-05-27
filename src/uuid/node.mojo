@@ -1,4 +1,4 @@
-from .libc import get_secure_random_u64
+from crypto.random import generate_secure_u64
 
 
 struct NodeManager:
@@ -31,7 +31,7 @@ struct NodeManager:
         Raises:
             `Error`: If secure random bytes cannot be obtained for node ID initialization.
         """
-        var value = get_secure_random_u64() & 0xFFFFFFFFFFFF
+        var value = generate_secure_u64() & 0xFFFFFFFFFFFF
         value = value | (UInt64(1) << 40)
 
         self.node_id[0] = UInt8((value >> 40) & 0xFF)
