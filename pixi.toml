@@ -10,13 +10,13 @@ description = "A high-performance Mojo library for generating, parsing, validati
 license = "MIT"
 platforms = ["osx-arm64", "linux-64", "linux-aarch64"]
 readme = "README.md"
-version = "1.0.0"
+version = "1.1.0"
 
 [tasks]
 build = "mojo package src/uuid -o uuid.mojopkg"
 test = "sh scripts/run_tests.sh"
 format = "mojo format src/uuid"
-build_rattler = "rattler-build build --recipe conda.recipe/recipe.yaml -c conda-forge -c https://conda.modular.com/max -c https://repo.prefix.dev/modular-community"
+build_rattler = "rattler-build build --recipe conda.recipe/recipe.yaml -c https://conda.modular.com/max -c https://repo.prefix.dev/modular-community -c conda-forge"
 
 [dependencies]
 mojo = ">=1.0.0b1,<2"
