@@ -9,11 +9,9 @@ A high-performance Mojo library for generating, parsing, validating, and formatt
 - **Multiple UUID Versions**: Supports UUID v1, v3, v4, v5, v6, v7, and v8 generation
 - **RFC-9562 Compliant**: Full compliance with the latest UUID specification
 - **String Parsing**: Parse UUIDs from multiple string formats (canonical, URN, hex, braced)
-- **Format Support**: Convert between binary, canonical string, and URN representations
+- **Different Formats Support**: Convert between binary, canonical string, and URN representations
 - **Validation**: Comprehensive validation for UUID strings before parsing
 - **Cross-Platform**: Support for macOS (arm64), Linux (x86_64, aarch64)
-- **Secure Random**: Uses platform-specific secure random sources (arc4random on macOS, getrandom on Linux)
-- **Zero Dependencies**: No external dependencies beyond Mojo standard library
 
 ### Supported UUID Versions
 
@@ -224,7 +222,7 @@ var uuid2 = gen.v1()
 # Each new generator resets the clock sequence
 ```
 
-#### Stateless Versions (v4, v6, v7)
+#### Stateless Versions (v3, v4, v5, v6, v7, v8)
 
 While these versions don't maintain state, it's still recommended to reuse a single generator instance for the lifetime of your application:
 
@@ -340,19 +338,13 @@ The library is tested and supported on:
 - **Linux**: x86_64 (Intel/AMD)
 - **Linux**: aarch64 (ARM)
 
-Secure random number generation uses:
-
-- **macOS**: `arc4random()` from libc
-- **Linux**: `getrandom()` system call
-
-
 ## Package Structure
 
 - **`uuid.mojo`** - Core UUID type, parsing, formatting, and validation
 - **`generator.mojo`** - High-level UUID generator with support for v1-v8
 - **`time.mojo`** - Time source abstractions and timestamp management for time-based UUIDs
 - **`node.mojo`** - Node identifier management for v1 UUID generation
-- **`libc.mojo`** - FFI bindings to platform-specific system calls for random number generation and time retrieval
+- **`libc.mojo`** - FFI bindings to platform-specific system calls
 - **`__init__.mojo`** - Public API exports
 
 ## Development
