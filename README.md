@@ -65,7 +65,11 @@ def main() raises:
     print("UUID v7:", uuid_v7.to_string())
 
     # Access raw bytes
-    print("Raw bytes:", uuid_v4.bytes)
+    print("Raw bytes:", uuid_v4.to_bytes())
+
+    # Construct from a 16-byte buffer
+    var uuid_from_bytes = UUID.from_bytes(uuid_v4.to_bytes())
+    print("From bytes:", uuid_from_bytes.to_string())
 
     # Parse a UUID string
     var parsed = UUID.from_string("67e55044-10b1-426f-9247-bb680e5fe0c8")
@@ -163,7 +167,7 @@ def main() raises:
     print("URN:", uuid.urn())
 
     # Raw bytes
-    print("Bytes:", uuid.bytes)
+    print("Bytes:", uuid.to_bytes())
 
     # Version and variant inspection
     print("Version:", uuid.version().value)
@@ -247,7 +251,7 @@ Represents a 16-byte UUID value.
 **Methods:**
 
 - `__init__(bytes: SIMD[DType.uint8, 16])` - Initialize from raw bytes
-- `from_bytes(bytes: SIMD[DType.uint8, 16]) -> UUID` - Create from bytes
+- `from_bytes(bytes: Span[UInt8, ...]) -> UUID` - Create a UUID from a 16-byte byte span. Raises `ValidationError` if the span is not exactly 16 bytes.
 - `from_string(s: String) -> UUID` - Parse from string (raises `ValidationError` on invalid input)
 - `to_string() -> String` - Get canonical hyphenated form (e.g., `67e55044-10b1-426f-9247-bb680e5fe0c8`)
 - `to_bytes() -> SIMD[DType.uint8, 16]` - Get raw bytes

@@ -73,7 +73,7 @@ def test_v1_uuid_is_correct_uuid_created_from_bytes() raises:
     var generator = Generator()
     var uuid = generator.v1()
 
-    var new_uuid = UUID.from_bytes(uuid.bytes)
+    var new_uuid = UUID(uuid.bytes)
     assert_equal(uuid, new_uuid)
 
 
@@ -164,7 +164,7 @@ def test_v3_uuid_is_correct_uuid_created_from_bytes() raises:
     var generator = Generator()
     var uuid = generator.v3(starter_uuid, example_name)
 
-    var new_uuid = UUID.from_bytes(uuid.bytes)
+    var new_uuid = UUID(uuid.bytes)
     assert_equal(uuid, new_uuid)
 
 
@@ -277,7 +277,7 @@ def test_v4_uuid_is_correct_uuid_created_from_bytes() raises:
     var generator = Generator()
     var uuid = generator.v4()
 
-    var new_uuid = UUID.from_bytes(uuid.bytes)
+    var new_uuid = UUID(uuid.bytes)
     assert_equal(uuid, new_uuid)
 
 
@@ -356,7 +356,7 @@ def test_v5_uuid_is_correct_uuid_created_from_bytes() raises:
     var generator = Generator()
     var uuid = generator.v5(starter_uuid, example_name)
 
-    var new_uuid = UUID.from_bytes(uuid.bytes)
+    var new_uuid = UUID(uuid.bytes)
     assert_equal(uuid, new_uuid)
 
 
@@ -469,7 +469,7 @@ def test_v6_uuid_is_correct_uuid_created_from_bytes() raises:
     var generator = Generator()
     var uuid = generator.v6()
 
-    var new_uuid = UUID.from_bytes(uuid.bytes)
+    var new_uuid = UUID(uuid.bytes)
     assert_equal(uuid, new_uuid)
 
 
@@ -540,7 +540,7 @@ def test_v7_uuid_is_correct_uuid_created_from_bytes() raises:
     var generator = Generator()
     var uuid = generator.v7()
 
-    var new_uuid = UUID.from_bytes(uuid.bytes)
+    var new_uuid = UUID(uuid.bytes)
     assert_equal(uuid, new_uuid)
 
 
@@ -627,7 +627,7 @@ def test_v8_uuid_is_correct_uuid_created_from_bytes() raises:
     var generator = Generator()
     var uuid = generator.v8(a, b, c)
 
-    var new_uuid = UUID.from_bytes(uuid.bytes)
+    var new_uuid = UUID(uuid.bytes)
     assert_equal(uuid, new_uuid)
 
 

@@ -100,17 +100,27 @@ struct UUID(Equatable, ImplicitlyCopyable, Writable):
         self.bytes = bytes
 
     @staticmethod
-    def from_bytes(bytes: SIMD[DType.uint8, 16]) -> UUID:
+    def from_bytes(bytes: Span[UInt8, ...]) raises -> UUID:
         """
-        Construct a UUID from raw bytes.
+        Construct a UUID from a 16-byte byte span.
 
         Args:
-            bytes: A 16-byte SIMD vector representing the UUID.
+            bytes: A span containing exactly 16 bytes.
 
         Returns:
             `UUID`: A new UUID instance containing the provided bytes.
+
+        Raises:
+            `ValidationError`: If the span is not exactly 16 bytes long.
         """
-        return UUID(bytes)
+        if len(bytes) != 16:
+            raise ValidationError("UUID must be exactly 16 bytes")
+
+        var internal_bytes = SIMD[DType.uint8, 16](0)
+        for i in range(len(internal_bytes)):
+            internal_bytes[i] = bytes[i]
+
+        return UUID(internal_bytes)
 
     @staticmethod
     def from_string(s: String) raises -> UUID:

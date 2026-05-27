@@ -51,8 +51,11 @@ def test_uuid_parses_from_init_to_valid_string() raises:
 
 def test_uuid_parses_from_bytes_to_valid_string() raises:
     comptime expected = "67e55044-10b1-426f-9247-bb680e5fe0c8"
+    var raw_list = List[UInt8]()
+    for i in range(len(raw_data)):
+        raw_list.append(raw_data[i])
 
-    var uuid = UUID.from_bytes(raw_data)
+    var uuid = UUID.from_bytes(raw_list)
     var result = uuid.to_string()
 
     assert_equal(expected, result)
